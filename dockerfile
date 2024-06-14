@@ -1,21 +1,10 @@
-FROM node:18.18.0
+ARG NODE_VERSION=18.18.0
+FROM node:${NODE_VERSION}-alpine as base
+EXPOSE 3000
+ENV PROJECT_ENV production
+WORKDIR /usr/app/src
 
-
-WORKDIR /app 
-COPY package*.json ./  
-
-
-RUN npm install  
-
-
-COPY . .  
-
-
-ENV NODE_ENV prod
-RUN npm run build  
-
-
-EXPOSE 3000  
-
-
-CMD ["npm", "start"]  
+FROM base as prod
+ADD . /usr/app/src
+RUN npm install && npm run build && npm install -g http-server
+CMD http-server ./public -p 3000
